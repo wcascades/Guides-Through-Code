@@ -1,0 +1,12 @@
+allowed_hosts:
+  - 10.0.0.0/8
+  - 2001:DB8::/64
+  - 127.0.0.0/8
+  - 192.168.0.0/24
+
+unbound_include_files:
+  - forward.conf
+  - lan-zones.conf
+  - control.conf
+  - conf.d/*.conf
+  - blackhole.zone

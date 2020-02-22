@@ -1,0 +1,18 @@
+---
+# Handlers for dnsservers
+#
+- name: stop unbound
+  service:
+    name: local_unbound
+    state: stopped
+  become: yes
+
+- name: start unbound
+  service:
+    name: local_unbound
+    state: started
+  become: yes
+
+#- name: restart machine
+#  shell: /sbin/shutdown -r now
+#  become: True

@@ -1,0 +1,31 @@
+ext_if = "igb0"
+int_if = "igb1"
+int_net = "192.168.0.0/24" 
+#table <spamd-white> persist
+
+set skip on lo
+
+scrub in all
+
+nat log on $ext_if inet from $int_net to any -> ($ext_if)
+
+#nat-anchor "ftp-proxy/*"
+#rdr-anchor "ftp-proxy/*"
+#nat on $ext_if inet from !($ext_if) -> ($ext_if:0)
+#rdr pass on $int_if proto tcp to port ftp -> 127.0.0.1 port 8021
+#no rdr on $ext_if proto tcp from <spamd-white> to any port smtp
+#rdr pass on $ext_if proto tcp from any to any port smtp \
+#	-> 127.0.0.1 port spamd
+
+#anchor "ftp-proxy/*"
+#block in
+#pass out
+
+#pass quick on $int_if no state
+#antispoof quick for { lo $int_if }
+
+#pass in on $ext_if proto tcp to ($ext_if) port ssh
+#pass in log on $ext_if proto tcp to ($ext_if) port smtp
+#pass out log on $ext_if proto tcp from ($ext_if) to port smtp
+#pass in on $ext_if inet proto icmp from any to ($ext_if) icmp-type { unreach, redir, timex }
+pass in on $ext_if from 10.0.0.178 to $int_net

@@ -1,0 +1,8 @@
+---
+  - hosts: dnsservers
+    gather_facts: no
+    tasks:
+      - name: Wake up all machines
+        wakeonlan:
+          mac: "{{ hostvars[inventory_hostname].MAC_address }}"
+        delegate_to: 127.0.0.1

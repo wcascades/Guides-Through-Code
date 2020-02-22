@@ -1,0 +1,12 @@
+# started/stopped are idempotent actions that will not run commands unless necessary
+---
+- hosts: oldrouter
+  tasks:
+    - name: Start Local Unbound
+      service:
+        name: local_unbound
+        state: started
+      become: yes
+
+    
+

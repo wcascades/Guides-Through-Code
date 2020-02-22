@@ -1,0 +1,16 @@
+# router deployment
+
+- name: push rc.conf
+  template:
+          src: rc.conf.j2
+          dest: /etc/rc.conf
+  become: true
+
+- name: push dhcpd.conf
+  template:
+          src: dhcpd.conf.j2
+          dest: /usr/local/etc/dhcpd.conf
+          owner: root
+          group: wheel
+          mode: '0644'
+  become: true

@@ -1,0 +1,2 @@
+# shutdown servers
+ansible dnsservers -a "/sbin/shutdown -p now" --become

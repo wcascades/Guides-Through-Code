@@ -1,0 +1,24 @@
+#jinja2: lstrip_blocks: True
+server:
+	username: unbound
+	directory: /var/unbound
+	chroot: /var/unbound
+	pidfile: /var/run/local_unbound.pid
+	auto-trust-anchor-file: /var/unbound/root.key
+	# listen on all interfaces
+	interface: 0.0.0.0 
+	interface:  ::0
+  {% for acl in allowed_hosts %}
+	access-control: {{ acl }} allow
+	{% endfor %}
+
+	verbosity: 1
+	port: 53
+	do-ip4: yes
+	do-ip6: yes
+	do-udp: yes
+	do-tcp: yes
+
+{% for incFile in unbound_include_files %}
+include: /var/unbound/{{ incFile }}
+{% endfor %}

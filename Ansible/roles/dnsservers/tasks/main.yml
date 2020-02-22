@@ -1,0 +1,111 @@
+---
+# dnsserver deployment
+
+- name: Python Bootstrap
+  raw: pkg install -y python3
+  become: true
+  tags:
+    - bootstrap
+
+- name: Install bash
+  pkgng:
+    name: bash
+    state: present
+  become: true
+
+- name: Install vim
+  pkgng:
+    name: vim
+    state: present
+  become: true
+
+- name: Disable sendmail
+  lineinfile:
+    path: /etc/rc.conf
+    regexp: 'sendmail_enable'
+    line: 'sendmail_enable="no"'
+    create: yes
+  become: true
+
+- name: Enable local_unbound startup
+  lineinfile:
+    path: /etc/rc.conf
+    regexp: '^local_unbound_enable'
+    line: 'local_unbound_enable="yes"'
+    create: yes
+  notify:
+    - start unbound
+  become: true
+  tags:
+    - unbound
+
+- name: Create blackhole file
+  file:
+    path: /var/unbound/blackhole.zone
+    state: touch
+    owner: root
+    mode: '0777'
+  become: true
+  tags:
+    - unbound
+    - blackhole
+
+- name: Push forward.conf
+  template:
+    src: forward.conf.j2
+    dest: /var/unbound/forward.conf
+  become: true
+  notify:
+    - stop unbound
+    - start unbound
+  tags:
+    - unbound
+
+- name: Push unbound.conf
+  template:
+    src: unbound.conf.j2
+    dest: /var/unbound/unbound.conf
+  become: true
+  notify:
+    - stop unbound
+    - start unbound
+      #    - restart machine
+  tags:
+    - unbound
+
+- name: Install wget
+  pkgng:
+    name: wget
+    state: present
+  become: true
+  tags:
+    - blackhole
+
+- name: Push blackhole_updater.sh
+  template:
+    src: blackhole_updater.sh.j2
+    dest: /var/unbound/blackhole_updater.sh
+    owner: root
+    mode: '0755'
+  become: true
+  notify:
+    - stop unbound
+    - start unbound
+  tags:
+    - blackhole
+
+- name: Blackhole crontab
+  cron:
+    name: "blackhole updater"
+    minute: "0"
+    hour: "1"
+    job: "/var/unbound/blackhole_updater.sh"
+  become: true
+  tags:
+    - blackhole
+
+- name: Run blackhole_updater.sh
+  become: true
+  shell: /var/unbound/blackhole_updater.sh
+  tags:
+    - blackhole
