@@ -40,15 +40,8 @@ function Test-RecursionInBeginBlock {
     begin {
         Write-Host "$(Get-Date): Entering Begin Block. Counter value = $global:counter"
        $global:counter++
-       $arr = @() 
        if ($CSVpath) {
-           Import-Csv $CSVpath | ForEach-Object {
-              $arr += $_.Employee
-            }
-            Write-Host "arr type = $($arr.GetType())"
-            Write-Host "arr value is $arr"
-            Write-Host "Length of arr = $($arr.length)"
-            $arr | Test-RecursionInBeginBlock
+           Import-Csv $CSVpath | Select-Object -ExpandProperty Employee | Test-RecursionInBeginBlock
         }
     } 
     process {
